@@ -2,10 +2,11 @@ from django.contrib.auth import authenticate, logout
 
 from config.settings import SECRET_KEY
 
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+
 import jwt
 
 from .models import User
@@ -18,10 +19,10 @@ class Login(APIView):
         if serializer.is_valid():
             username = serializer.validated_data['username']
             password = serializer.validated_data['password']
+            
+            user = authenticate(username=username, password=password)
 
-            user = authenticate(request,username, password )
-
-            if user:
+            if user is not None:
                 token = jwt.encode(
                 {"pk": user.pk},
                 SECRET_KEY,
@@ -32,14 +33,14 @@ class Login(APIView):
                     "message": f"Welcome {username}",
                     "data":{
                         "token": token
-                    }},
-                    status=status.HTTP_200_OK)
+                    },
+                    "errors": None}, status=status.HTTP_200_OK)
             else:
                 return Response({
                     "success": False,
                     "message": "failed to login, unvalid username or password",
-                    "data": None},
-                    status=status.HTTP_401_UNAUTHORIZED)
+                    "data": None,
+                    "errors": None}, status=status.HTTP_401_UNAUTHORIZED)
             
         else: return Response({"success": False,
             "message": "failed to login",
@@ -54,7 +55,11 @@ class LogOut(APIView):
 
     def post(self, request):
         logout(request)
-        return Response({"success": True, "message": "bye!" }, status=status.HTTP_200_OK)
+        return Response({
+            "success": True,
+            "message": "good bye",
+            "data": None,
+            "errors": None}, status=status.HTTP_200_OK)
 
 
 class Join(APIView):
@@ -65,7 +70,7 @@ class Join(APIView):
             username = serializer.validated_data['username']
             password = serializer.validated_data['password']
             
-            User.objects.create_user(username, password)
+            User.objects.create_user(username=username, password=password)
 
             return Response({
                 "success": True,
