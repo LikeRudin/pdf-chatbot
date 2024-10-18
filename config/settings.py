@@ -46,6 +46,12 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+CUSTOM_APPS = [
+    "users.apps.UsersConfig",
+]
+
+THIRD_PARTY_APPS = ["rest_framework",'corsheaders']
+
 
 SYSTEM_APPS = [
     'django.contrib.admin',
@@ -56,17 +62,12 @@ SYSTEM_APPS = [
     'django.contrib.staticfiles',
 ]
 
-CUSTOM_APPS = [
-    "users.apps.UsersConfig",
-]
-
-THIRD_PARTY_APPS = ["rest_framework",'corsheaders']
 
 
 
-INSTALLED_APPS = SYSTEM_APPS + THIRD_PARTY_APPS + SYSTEM_APPS
+INSTALLED_APPS = THIRD_PARTY_APPS + CUSTOM_APPS + SYSTEM_APPS
 
-ADD_MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware',]
+THIRD_PARTY_MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware',]
 
 SYSTEM_MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -78,7 +79,7 @@ SYSTEM_MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-MIDDLEWARE = SYSTEM_MIDDLEWARE + ADD_MIDDLEWARE
+MIDDLEWARE = THIRD_PARTY_MIDDLEWARE + SYSTEM_MIDDLEWARE 
 
 ROOT_URLCONF = 'config.urls'
 
@@ -107,11 +108,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': get_secret("DB_NAME"),
-        'USER': get_secret("DB_USER"),
-        'PASSWORD': get_secret("DB_PASSWORD"),
-        'HOST': get_secret("DB_HOST"),
-        'PORT': get_secret("DB_PORT"),
+        'NAME': get_secret("LOCAL_DB_NAME"),
+        'USER': get_secret("LOCAL_DB_USER"),
+        'PASSWORD': get_secret("LOCAL_DB_PASSWORD"),
+        'HOST': get_secret("LOCAL_DB_HOST"),
+        'PORT': get_secret("LOCAL_DB_PORT"),
     }
 }
 
@@ -156,3 +157,14 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ALLOW_METHODS = (
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+)
+
+CORS_ALLOW_HEADERS = ("*")

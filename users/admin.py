@@ -1,6 +1,4 @@
 from django.contrib import admin
-
-from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import User
 
@@ -29,6 +27,8 @@ class CustomUserAdmin(UserAdmin):
                     "is_active",
                     "is_staff",
                     "is_superuser",
+                    "groups",
+                    "user_permissions",
                 ),
                 "classes": ("collapse",),
             },
