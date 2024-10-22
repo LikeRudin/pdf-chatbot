@@ -24,6 +24,27 @@ Frontend Repository: [pdf-chatbot-front](https://github.com/LikeRudin/pdf-chatbo
 | `POST` | `/api/v1/users/logout`       | 사용자 로그아웃      |
 | `POST` | `/api/v1/users/join`         | 사용자 회원가입  |
 
+2 번쨰 과제
+
+### 📜 **Conversations**
+
+| URI                         | Description        |
+|-----------------------------|--------------------|
+| `/api/v1/conversations/`   | 새로운 대화생성     |
+| `/api/v1/messages/`         |메시지 Read, Create |
+
+
+-> 실제 구현내용
+
+| Method | URI                         | Description        |
+|--------|-----------------------------|--------------------|
+| `GET` |  `/api/v1/conversations/`        | 사용자의 채팅방 목록 조회 |
+| `POST` | `/api/v1/conversations/`        | 새로운 채팅방 생성   |
+| `GET` | `/api/v1/conversations/pk/messages`        | 채팅방의 메시지 조회 |
+| `POST` |  `/api/v1/conversations/pk/messages`        |채팅방의 메시지 생성 |
+
+
+
 ---
 
 ## 🛠️ Stacks

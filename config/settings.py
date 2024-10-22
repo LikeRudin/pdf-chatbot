@@ -48,6 +48,7 @@ ALLOWED_HOSTS = []
 
 CUSTOM_APPS = [
     "users.apps.UsersConfig",
+    "conversations.apps.ConversationsConfig"
 ]
 
 THIRD_PARTY_APPS = ["rest_framework",'corsheaders']
@@ -99,9 +100,7 @@ TEMPLATES = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-]
+
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
@@ -112,11 +111,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': get_secret("DB_NAME"),
-        'USER': get_secret("DB_USER"),
-        'PASSWORD': get_secret("DB_PASSWORD"),
-        'HOST': get_secret("DB_HOST"),
-        'PORT': get_secret("DB_PORT"),
+        'NAME': get_secret("LOCAL_DB_NAME"),
+        'USER': get_secret("LOCAL_DB_USER"),
+        'PASSWORD': get_secret("LOCAL_DB_PASSWORD"),
+        'HOST': get_secret("LOCAL_DB_HOST"),
+        'PORT': get_secret("LOCAL_DB_PORT"),
     }
 }
 
