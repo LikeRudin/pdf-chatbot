@@ -1,7 +1,6 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound, PermissionDenied
 
@@ -10,7 +9,7 @@ from .models import Conversation, Message
 
 class Conversations(APIView):
     def get(self, request):
-        all_conversations = Conversation.objects.filter(user=request.user)
+        all_conversations = Conversation.objects.filter(user_id=request.user.id)
         serializer = ConversationSerializer(all_conversations, many=True)
         
         return Response({"success": True,
@@ -22,7 +21,7 @@ class Conversations(APIView):
     def post(self, request):
         serializer = ConversationSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(user=request.user)
+            serializer.save(user_id=request.user.id)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -63,7 +62,7 @@ class ConversationMessages(APIView):
             conversation = self.get_conversation(request,pk)
             serializer = MessageSerializer(data=request.data)
             if serializer.is_valid():
-                serializer.save(user=request.user, conversation=conversation)
+                serializer.save(user_id=request.user.id, conversation_id=conversation.id)
                 return Response({"success": True,
                                  "message": "Message created successfully",
                                  "data": serializer.data},status=status.HTTP_201_CREATED)
