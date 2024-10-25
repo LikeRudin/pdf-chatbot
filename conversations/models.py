@@ -1,4 +1,4 @@
-from django.db.models import ForeignKey, CharField, TextField, SET_NULL, CASCADE
+from django.db.models import ForeignKey, CharField, TextField, SET_NULL, CASCADE, IntegerField
 
 from base.models import BaseModel
 
@@ -20,8 +20,16 @@ class Conversation(BaseModel):
 
     count_messages.short_description = "Number of Messages"
 
+ROLE_CHOICES = [
+    ('user', 'User'),
+    ('system', 'System'),
+    ('chatbot', 'Chatbot'),
+]
 class Message(BaseModel):
+    role = CharField(choices=ROLE_CHOICES, default="system")
     payload = TextField(blank=False)
+    token_number = IntegerField(default=0)
+    
     user = ForeignKey(User, related_name="messages", on_delete=SET_NULL, null=True)
     conversation = ForeignKey(Conversation, related_name="messages", on_delete=CASCADE)
 

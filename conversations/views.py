@@ -9,7 +9,7 @@ from .models import Conversation, Message
 
 class Conversations(APIView):
     def get(self, request):
-        all_conversations = Conversation.objects.filter(user_id=request.user.id)
+        all_conversations = Conversation.objects.filter(user_id=request.user.id).filter(is_deleted=False)
         serializer = ConversationSerializer(all_conversations, many=True)
         
         return Response({"success": True,
@@ -26,7 +26,20 @@ class Conversations(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ConversationMessages(APIView):
+class AConversation(APIView):
+
+    def get(self, request, pk):
+        return
+    
+    def delete(self, request, pk):
+        try:
+            conversation = Conversation.objects.get(pk=pk)
+            conversation.delete()
+            return Response({"success": True, "message": "Conversation deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except Conversation.DoesNotExist:
+            return Response({"success": False, "error": "Conversation not found"}, status=status.HTTP_404_NOT_FOUND)
+
+class ConversationWithMessages(APIView):
     permission_classes = [IsAuthenticated]
 
     def get_conversation(self, request, pk):

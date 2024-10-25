@@ -43,7 +43,22 @@ Frontend Repository: [pdf-chatbot-front](https://github.com/LikeRudin/pdf-chatbo
 | `GET` | `/api/v1/conversations/pk/messages`        | 채팅방의 메시지 조회 |
 | `POST` |  `/api/v1/conversations/pk/messages`        |채팅방의 메시지 생성 |
 
+3 번째 과제
 
+### 🗝️ **API Keys**
+
+
+| Method | URI                         | Description        |
+|--------|-----------------------------|--------------------|
+| `GET` |  `/api/v1/keys/`        | 사용자의 api key 목록 조회|
+| `POST` | `/api/v1/keys/`        | 새로운 api key 등록  |
+| `Delete` | `/api/v1/keys/pk/`        | api key 삭제 |
+|`Get`| `/api/v1/keys/pk/statics`| api key 사용량 조회 |
+
+API Key를 선택하는 기능을 만들었습니다.
+신용카드처럼 여러개를 등록할 수있게 하기위해서입니다.
+하지만 아직 open ai의 apikey만 검증하여 등록할 수있습니다.
+통계와 비용분석 api는 형태만 만들어놨습니다..
 
 ---
 

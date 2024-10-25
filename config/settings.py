@@ -48,7 +48,8 @@ ALLOWED_HOSTS = []
 
 CUSTOM_APPS = [
     "users.apps.UsersConfig",
-    "conversations.apps.ConversationsConfig"
+    "conversations.apps.ConversationsConfig",
+    "keys.apps.KeysConfig"
 ]
 
 THIRD_PARTY_APPS = ["rest_framework",'corsheaders']

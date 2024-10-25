@@ -28,5 +28,7 @@ class User(AbstractUser):
         max_length=150,
         default="",
     )
+     has_api_key = models.BooleanField(default=False)
+
      def __str__(self):
         return self.username
