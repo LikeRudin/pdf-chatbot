@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound, PermissionDenied
 
-from .serializers import ConversationListSerializer, MessageSerializer
+from .serializers import ConversationListSerializer, MessageSerializer, ConversationWithMessageSerializer
 from .models import Conversation, Message
 
 from libs.response import ResponseDict
@@ -25,19 +25,6 @@ class Conversations(ExceptionAPIView):
 
 
 class AConversation(ExceptionAPIView):
-
-    def get(self, request, pk):
-        return
-    
-    def delete(self, request, pk):
-        conversation = Conversation.objects.get(pk=pk)
-        conversation.delete()
-        return Response(ResponseDict(success=True, message="Conversation deleted successfully"), status=status.HTTP_200_OK)
-    
-
-class ConversationWithMessages(ExceptionAPIView):
-    permission_classes = [IsAuthenticated]
-
     def get_conversation(self, request, pk):
         try:
             conversation = Conversation.objects.get(pk=pk)
@@ -46,14 +33,30 @@ class ConversationWithMessages(ExceptionAPIView):
         if conversation.user != request.user:
             raise PermissionDenied("Only the owner can access this conversation.")
         return conversation 
-    
+
     def get(self, request, pk):
-            conversation = self.get_conversation(request,pk)
-            messages = Message.objects.filter(conversation=conversation)
-            serializer = MessageSerializer(messages, many=True)
-            return Response(ResponseDict(success=True, message=f"messages from conversation{conversation.title}", data=serializer.data),
-                status=status.HTTP_200_OK
-            )
+        conversation = self.get_conversation(request, pk)
+        serializer = ConversationWithMessageSerializer(conversation)
+        return Response(ResponseDict(success=True, message=f"conversation f{conversation.title} with all messages", data=serializer.data), status=status.HTTP_200_OK)
+    
+    def delete(self, request, pk):
+        conversation = Conversation.objects.get(pk=pk)
+        conversation.delete()
+        return Response(ResponseDict(success=True, message="Conversation deleted successfully"), status=status.HTTP_200_OK)
+    
+
+class Messages(ExceptionAPIView):
+    permission_classes = [IsAuthenticated]
+
+    
+    def get_conversation(self, request, pk):
+        try:
+            conversation = Conversation.objects.get(pk=pk)
+        except Conversation.DoesNotExist:
+            raise NotFound("No conversation found.")
+        if conversation.user != request.user:
+            raise PermissionDenied("Only the owner can access this conversation.")
+        return conversation 
 
     
     def post(self,request,pk):
