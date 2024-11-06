@@ -1,45 +1,41 @@
 from rest_framework import status
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound, PermissionDenied
 
-from .serializers import ConversationSerializer, MessageSerializer
+from .serializers import ConversationListSerializer, MessageSerializer
 from .models import Conversation, Message
 
-class Conversations(APIView):
+from libs.response import ResponseDict
+from libs.ExceptionAPIView import ExceptionAPIView
+
+class Conversations(ExceptionAPIView):
     def get(self, request):
         all_conversations = Conversation.objects.filter(user_id=request.user.id).filter(is_deleted=False)
-        serializer = ConversationSerializer(all_conversations, many=True)
+        serializer = ConversationListSerializer(all_conversations, many=True)
         
-        return Response({"success": True,
-            "message": "get Every Conversation of user",
-            "data": serializer.data
-            }, status=status.HTTP_200_OK)
-        
+        return Response(ResponseDict(success=True, message="read conversation list of user", data=serializer.data, errors=None), status=status.HTTP_200_OK)
 
     def post(self, request):
-        serializer = ConversationSerializer(data=request.data)
+        serializer = ConversationListSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user_id=request.user.id)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(ResponseDict(success=True, message="create a conversation", data=serializer.data, errors=None),status=status.HTTP_201_CREATED)
+        return Response(ResponseDict(success=False, message="failed to create a conversation",data=None, errors=serializer.errors), status=status.HTTP_400_BAD_REQUEST)
 
 
-class AConversation(APIView):
+class AConversation(ExceptionAPIView):
 
     def get(self, request, pk):
         return
     
     def delete(self, request, pk):
-        try:
-            conversation = Conversation.objects.get(pk=pk)
-            conversation.delete()
-            return Response({"success": True, "message": "Conversation deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-        except Conversation.DoesNotExist:
-            return Response({"success": False, "error": "Conversation not found"}, status=status.HTTP_404_NOT_FOUND)
+        conversation = Conversation.objects.get(pk=pk)
+        conversation.delete()
+        return Response(ResponseDict(success=True, message="Conversation deleted successfully"), status=status.HTTP_200_OK)
+    
 
-class ConversationWithMessages(APIView):
+class ConversationWithMessages(ExceptionAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_conversation(self, request, pk):
@@ -47,45 +43,25 @@ class ConversationWithMessages(APIView):
             conversation = Conversation.objects.get(pk=pk)
         except Conversation.DoesNotExist:
             raise NotFound("No conversation found.")
-
         if conversation.user != request.user:
             raise PermissionDenied("Only the owner can access this conversation.")
-
         return conversation 
+    
     def get(self, request, pk):
-        try:
             conversation = self.get_conversation(request,pk)
             messages = Message.objects.filter(conversation=conversation)
             serializer = MessageSerializer(messages, many=True)
-
-            return Response({"success": True,
-                "message": "messages of chatroom",
-                "data": serializer.data,}, 
+            return Response(ResponseDict(success=True, message=f"messages from conversation{conversation.title}", data=serializer.data),
                 status=status.HTTP_200_OK
             )
-        
-        except NotFound as e:
-            return Response({"success": False, "message":e.detail, "errors": e}, status=status.HTTP_404_NOT_FOUND)
-        except PermissionDenied as e:
-            return Response({"success": False, "message":e.detail, "errors": e}, status=status.HTTP_403_FORBIDDEN)
 
     
     def post(self,request,pk):
-        try:
             conversation = self.get_conversation(request,pk)
             serializer = MessageSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save(user_id=request.user.id, conversation_id=conversation.id)
-                return Response({"success": True,
-                                 "message": "Message created successfully",
-                                 "data": serializer.data},status=status.HTTP_201_CREATED)
+                return Response(ResponseDict(success=True, message="Message created successfully",data=serializer.data),status=status.HTTP_201_CREATED)
         
-            return Response({"success": False,
-                             "message": "Validation error. Not Valid Message",
-                             "errors": serializer.errors},
+            return Response(ResponseDict(success=False, message="Validation error. Not Valid Message", data=None, errors= serializer.erros),
                             status=status.HTTP_400_BAD_REQUEST)
-        
-        except NotFound as e:
-            return Response({"success": False, "message":e.detail, "errors": e}, status=status.HTTP_404_NOT_FOUND)
-        except PermissionDenied as e:
-            return Response({"success": False, "message":e.detail, "errors": e}, status=status.HTTP_403_FORBIDDEN)
